@@ -52,8 +52,8 @@ The assignment instructions are the same as for the previous assignment, but for
 
 
 \blu{\enum{
-\item Name(s):
-\item Student ID(s):
+\item Name(s): Dingqing Yang, Junjie Zhu
+\item Student ID(s): 38800141, 30921167
 }}
 
 
@@ -174,10 +174,24 @@ The function \emph{example\_CD.jl} loads a dataset and tries to fit an L2-regula
  \item While it doesn't improve the worst-case time complexity (without making stronger assumptions), you might expect to improve performance by using a more-clever choice of step-size. \blu{Modify the code to compute the optimal step-size (which you can do in closed-form without increasing the runtime), and report the effect of using the optimal step-size on the time and number of iterations.}
 }
 
+
+
 \subsection{Stochastic Gradient}
 
-Coming soon...
+If you run the demo \emph{example\_SG.jl}, it will load a dataset and try to fit an L2-regularized logistic regression model using 10 ``passes'' of stochastic gradient using the step-size of $\alpha_t = 1/\lambda t$ that is suggested in many theory papers. Note that in other high-level languages (like R/Matlab/Python) this demo would run really slowly so you would need to write the inner loop in a low-level language like C, but in Julia you can directly write the stochastic gradient code and have it run fast.
 
+Unfortunately, despite Julia making this code run fast compared to other high-level languages, the performance of this stochastic gradient method is atrocious. It often goes to areas of the parameter space where the objective function overflows and the final value is usually in the range of something like $6.5-7.5 \times 10^4$. This is quite far from the solution of $2.7068 \times 10^4$ and is even worse than just choosing $w=0$ which gives $3.5 \times 10^4$. (This is unlike gradient descent and coordinate optimization, which never increase the objective function if your step-size is small enough.)
+
+\enum{
+\item Although $\alpha_t = 1/\lambda t$ gives the best possible convergence rate in the worst case, in practice it's typically horrible (as we're not usually opitmizing the hardest possible $\lambda$-strongly convex function). Experiment with different choices of step-size sequence to see if you can get better performance. \blu{Report the step-size sequence that you found gave the best performance, and the objective function value obtained by this strategy for one run}.
+\item Besides tuning the step-size, another strategy that often improves the performance is using a (possibly-weighted) average of the iterations $w^t$. Explore whether this strategy can improve performance.  \blu{Report the performance with an averaging strategy, and the objective function value obtained by this strategy for one run}. Note that the best step-size sequence with averaging might be different than without averaging (usually you can use bigger steps when you average).
+\item A popular variation on stochastic is AdaGrad, which uses the iteration
+\[
+w^{k+1} = w^k - \alpha_k D_k \nabla f(w^k),
+\]
+where the element in position $(j,j)$ of the diagonal matrix $D_k$ is given by $1/\sqrt{\delta + \sum_{k'=0}^k(\nabla_j f_{i_{k'}}(w^{k'}))^2}$. Here, $i_k$ is the example $i$ selected on iteration $k$ and $\nabla_j$ denotes element $j$ of the gradient (and in AdaGrad we typically don't average the steps).  Implement this algorithm and experiment with the tuning parameters $\alpha_t$ and $\delta$. \blu{Hand in your code as well as the best step-size sequence you found and again report the performance for one run}.
+\item Impelement the SAG algorithm with a step-size of $1/L$, where $L$ is the maximum Lipschitz constant across the training examples ($L = \frac{1}{4}\max_i\{\norm{x^i}^2\} + \lambda$).  \blu{Hand in your code and again report the performance for one run}.
+}
 
 \section{Very-Short Answer Questions}
 
