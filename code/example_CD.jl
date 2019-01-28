@@ -21,7 +21,7 @@ time_start = time_ns()
 # Compute Lipschitz constant of 'f'
 # sd = eigen(X'X)
 # L = maximum(sd.values) + lambda;
-Lc = maximum(sum(X.^2, dims=1)) + lambda
+# Lc = maximum(sum(X.^2, dims=1)) + lambda
 
 # Start running coordinate descent
 w_old = copy(w);
@@ -36,7 +36,8 @@ for k in 1:maxPasses*d
     # g_j = g[j];
 
     # Update variable
-    w[j] -= (1/Lc)*g_j;
+    Lj = norm(X[:, j])^2 + lambda
+    w[j] -= (1/Lj)*g_j;
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
