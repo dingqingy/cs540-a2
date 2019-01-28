@@ -1,6 +1,6 @@
 # Load X and y variable
 using JLD, Printf, LinearAlgebra
-data = load("binaryData.jld")
+data = load("../data/binaryData.jld")
 (X,y) = (data["X"],data["y"])
 
 # Add bias variable, initialize w, set regularization and optimization parameters
@@ -19,8 +19,9 @@ verbose = true
 time_start = time_ns()
 
 # Compute Lipschitz constant of 'f'
-sd = eigen(X'X)
-L = maximum(sd.values) + lambda;
+# sd = eigen(X'X)
+# L = maximum(sd.values) + lambda;
+Lc = maximum(sum(X.^2, dims=1)) + lambda
 
 # Start running coordinate descent
 w_old = copy(w);
@@ -29,23 +30,26 @@ for k in 1:maxPasses*d
     # Choose variable to update 'j'
     j = rand(1:d)
 
-    # Compute partial derivative 'g_j'
-    r = X*w - y
-    g = X'*r + lambda*w
-    g_j = g[j];
+    # Compute partial derivative 'g_j' # compute full gradient takes O(nd) (i.e. matrix multiplication)
+    r = X*w - y 
+    g_j = dot(X[:, j],r) + lambda*w[j]
+    # g_j = g[j];
 
     # Update variable
-    w[j] -= (1/L)*g_j;
+    w[j] -= (1/Lc)*g_j;
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
     if mod(k,d) == 0
-        r = X*w - y
-        f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
+        # debugging only
+        # r = X*w - y
+        # f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
         delta = norm(w-w_old,Inf);
-        if verbose
-            @printf("Passes = %d, function = %.4e, change = %.4f\n",k/d,f,delta);
-        end
+        # if verbose
+        #     @printf("Passes = %d, function = %.4e, change = %.4f\n",k/d,f,delta);
+        # end
+
+        # check tolerance
         if delta < progTol
             @printf("Parameters changed by less than progTol on pass\n");
             break;
