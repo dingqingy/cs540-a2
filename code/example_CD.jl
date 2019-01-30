@@ -18,10 +18,11 @@ verbose = true
 # Start timer
 time_start = time_ns()
 
-# Compute Lipschitz constant of 'f'
-# sd = eigen(X'X)
-# L = maximum(sd.values) + lambda;
-# Lc = maximum(sum(X.^2, dims=1)) + lambda
+# 2.2.1 Compute Lc
+Lc = maximum(sum(X.^2, dims=1)) + lambda
+
+XTX = X'X
+Xy = X'y
 
 # Start running coordinate descent
 w_old = copy(w);
@@ -31,13 +32,18 @@ for k in 1:maxPasses*d
     j = rand(1:d)
 
     # Compute partial derivative 'g_j' # compute full gradient takes O(nd) (i.e. matrix multiplication)
-    r = X*w - y 
-    g_j = dot(X[:, j],r) + lambda*w[j]
+    # r = X*w - y 
+    # g_j = dot(X[:, j],r) + lambda*w[j]
+    g_j = dot(XTX[:,j],w) + lambda*Xy[j]
     # g_j = g[j];
 
     # Update variable
-    Lj = norm(X[:, j])^2 + lambda
-    w[j] -= (1/Lj)*g_j;
+    # 2.2.1
+    w[j] -= (1/Lc)*g_j;
+
+    # 2.2.2
+    # Lj = norm(X[:, j])^2 + lambda
+    # w[j] -= (1/Lj)*g_j;
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial

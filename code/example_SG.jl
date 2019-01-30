@@ -1,6 +1,6 @@
 # Load X and y variable
 using JLD, Printf, LinearAlgebra
-data = load("quantum.jld")
+data = load("../data/quantum.jld")
 (X,y) = (data["X"],data["y"])
 
 # Add bias variable, initialize w, set regularization and optimization parameters
@@ -26,7 +26,9 @@ for k in 1:maxPasses*n
     g_i = r_i*X[i,:] + (lambda_i)*w
 
     # Choose the step-size
-    alpha = 1/(lambda_i*k)
+    # alpha = 1/(lambda_i*k)
+    alpha = 1/sqrt(k)
+    # alpha = 0.001
 
     # Take thes stochastic gradient step
     global w -= alpha*g_i
