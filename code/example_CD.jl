@@ -19,10 +19,11 @@ verbose = true
 time_start = time_ns()
 
 # 2.2.1 Compute Lc
-Lc = maximum(sum(X.^2, dims=1)) + lambda
+# Lc = maximum(sum(X.^2, dims=1)) + lambda
 
-XTX = X'X
-Xy = X'y
+# XTX = X'X
+XTy = X'y
+Xw = zeros(n, 1)
 
 # Start running coordinate descent
 w_old = copy(w);
@@ -34,16 +35,18 @@ for k in 1:maxPasses*d
     # Compute partial derivative 'g_j' # compute full gradient takes O(nd) (i.e. matrix multiplication)
     # r = X*w - y 
     # g_j = dot(X[:, j],r) + lambda*w[j]
-    g_j = dot(XTX[:,j],w) + lambda*Xy[j]
+    g_j = dot(X[:,j],Xw) -XTy[j]+ lambda*w[j]
     # g_j = g[j];
 
     # Update variable
     # 2.2.1
-    w[j] -= (1/Lc)*g_j;
+    # w[j] -= (1/Lc)*g_j;
+    # global Xw -= (1/Lc)*g_j*X[:,j]
 
     # 2.2.2
-    # Lj = norm(X[:, j])^2 + lambda
-    # w[j] -= (1/Lj)*g_j;
+    Lj = norm(X[:, j])^2 + lambda
+    w[j] -= (1/Lj)*g_j;
+    global Xw -= (1/Lj)*g_j*X[:,j]
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
