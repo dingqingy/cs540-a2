@@ -40,13 +40,13 @@ for k in 1:maxPasses*d
 
     # Update variable
     # 2.2.1
-    # w[j] -= (1/Lc)*g_j;
+    # w[j] -= (1/Lc)*g_j
     # global Xw -= (1/Lc)*g_j*X[:,j]
 
     # 2.2.2
     Lj = norm(X[:, j])^2 + lambda
-    w[j] -= (1/Lj)*g_j;
-    global Xw -= (1/Lj)*g_j*X[:,j]
+    w[j] -= (1/Lj)*g_j
+    global Xw -= (1/Lj)*g_j*X[:,j] # inside the for loop, it is defined before use, make it global so it can see outside Xw
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
