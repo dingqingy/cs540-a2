@@ -5,7 +5,7 @@ data = load("../data/groupData.jld")
 
 # Fit multi-class logistic regression classifer
 include("logReg.jl")
-# model = logRegSoftmax(X,y)
+# to run one model, you can comment the other two
 # model = logRegSoftmaxL2(X,y)
 # model = logRegSoftmaxL1(X,y)
 model = logRegSoftmaxGL1(X,y)
