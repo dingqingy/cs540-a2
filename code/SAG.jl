@@ -34,8 +34,6 @@ for k in 1:maxPasses*n
     v[i] = r_i
 
     # Choose the step-size
-    # alpha = 1/(lambda_i*k)
-    # alpha = 10/sqrt(k)
     alpha = 1/L
 
     # Take thes stochastic gradient step

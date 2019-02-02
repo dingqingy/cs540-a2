@@ -14,10 +14,6 @@ verbose = true
 w = zeros(d,1)
 lambda_i = lambda/n # Regularization for individual example in expectation
 
-# for running averages
-tracked = 4
-w_prev = zeros(d, tracked)
-
 # Start running stochastic gradient
 w_old = copy(w);
 for k in 1:maxPasses*n
@@ -30,21 +26,11 @@ for k in 1:maxPasses*n
     g_i = r_i*X[i,:] + (lambda_i)*w
 
     # Choose the step-size
-    # alpha = 1/(lambda_i*k)
-    # alpha = 10/sqrt(k)
-    alpha = 0.01
-
-    # shift tracked weights 
-    for i in 1:(tracked-1)
-        w_prev[:, i+1] = copy(w_prev[:,i])
-    end
-    w_prev[:,1] = copy(w)
+    # alpha = 1/sqrt(k)
+    alpha = 0.001
 
     # Take thes stochastic gradient step
     global w -= alpha*g_i
-    # w = 0.9*w + 0.1*w_old # 2.8k for 100 passes
-    w_total = sum(w_prev, dims=2) + w
-    w = w_total / (tracked + 1)
 
     # Check for lack of progress after each "pass"
     if mod(k,n) == 0

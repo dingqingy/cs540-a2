@@ -14,14 +14,13 @@ progTol = 1e-4
 verbose = true
 
 ## Run and time coordinate descent to minimize L2-regularization logistic loss
-
+print(d)
 # Start timer
 time_start = time_ns()
 
 # 2.2.1 Compute Lc
-# Lc = maximum(sum(X.^2, dims=1)) + lambda
+Lc = maximum(sum(X.^2, dims=1)) + lambda
 
-# XTX = X'X
 XTy = X'y
 Xw = zeros(n, 1)
 
@@ -32,32 +31,23 @@ for k in 1:maxPasses*d
     # Choose variable to update 'j'
     j = rand(1:d)
 
-    # Compute partial derivative 'g_j' # compute full gradient takes O(nd) (i.e. matrix multiplication)
-    # r = X*w - y 
-    # g_j = dot(X[:, j],r) + lambda*w[j]
+    # Compute partial derivative 'g_j' 
     g_j = dot(X[:,j],Xw) -XTy[j]+ lambda*w[j]
-    # g_j = g[j];
 
-    # Update variable
-    # 2.2.1
-    # w[j] -= (1/Lc)*g_j
-    # global Xw -= (1/Lc)*g_j*X[:,j]
-
-    # 2.2.2
-    Lj = norm(X[:, j])^2 + lambda
-    w[j] -= (1/Lj)*g_j
-    global Xw -= (1/Lj)*g_j*X[:,j] # inside the for loop, it is defined before use, make it global so it can see outside Xw
+    # Update variable 2.2.1
+    w[j] -= (1/Lc)*g_j
+    global Xw -= (1/Lc)*g_j*X[:,j]
 
     # Check for lack of progress after each "pass"
     # - Turn off computing 'f' and printing progress if timing is crucial
     if mod(k,d) == 0
         # debugging only
-        # r = X*w - y
-        # f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
+        r = X*w - y
+        f = (1/2)norm(r)^2 + (lambda/2)norm(w)^2
         delta = norm(w-w_old,Inf);
-        # if verbose
-        #     @printf("Passes = %d, function = %.4e, change = %.4f\n",k/d,f,delta);
-        # end
+        if verbose
+            @printf("Passes = %d, function = %.4e, change = %.4f\n",k/d,f,delta);
+        end
 
         # check tolerance
         if delta < progTol
