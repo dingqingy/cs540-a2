@@ -43,7 +43,7 @@ end
 
 
 ### Softmax L2 START ###
-function softmaxObjL2(w,X,y,k, lambda=10)
+function softmaxObjL2(w,X,y,k,lambda)
 	(n,d) = size(X)
 
 	W = reshape(w,d,k)
@@ -66,14 +66,14 @@ function softmaxObjL2(w,X,y,k, lambda=10)
 	return (nll,reshape(G,d*k,1))
 end
 
-function logRegSoftmaxL2(X,y)
+function logRegSoftmaxL2(X,y,lambda=10)
 	(n,d) = size(X)
 	k = maximum(y)
 
 	# Each column of 'w' will be a logistic regression classifier
 	W = zeros(d,k)
 
-	funObj(w) = softmaxObjL2(w,X,y,k)
+	funObj(w) = softmaxObjL2(w,X,y,k,lambda)
 
 	W[:] = findMin(funObj,W[:],derivativeCheck=true,maxIter=50)
 
